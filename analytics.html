@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ADT | Analytics</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">📘 ADT</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="calendar.html">Calendar</a>
+    <a class="active" href="analytics.html">Analytics</a>
+  </div>
+</nav>
+
+<div class="container analytics-container">
+
+  <div class="chart-card">
+    <h3>Status Distribution</h3>
+    <canvas id="pieChart" width="300" height="300"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Assignments by Priority</h3>
+    <canvas id="barChart" width="400" height="300"></canvas>
+  </div>
+
+</div>
+
+<script src="js/analytics.js"></script>
+</body>
+</html>

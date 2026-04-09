@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>ADT | Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+<script>
+if(!document.cookie.includes("user=loggedin")){
+    window.location.href = "login.html";
+}
+</script>
+  <nav class="navbar">
+    <div class="logo">📘 ADT</div>
+    <div class="nav-links">
+      <a class="active" href="index.html">Dashboard</a>
+      <a href="calendar.html">Calendar</a>
+      <a href="analytics.html">Analytics</a>
+    </div>
+  </nav>
+  <div class="dash">
+    <h1>Dashboard</h1>
+    <p>Track and manage all your assignments in one place.</p>
+  </div>
+  <div class="container">
+    <div class="stat-card total">
+      <span class="icon">📋</span>
+      <h2 id="totalCount">3</h2>
+      <p>Total</p>
+    </div>
+
+    <div class="stat-card pending">
+      <span class="icon">⏳</span>
+      <h2 id="pendingCount">2</h2>
+      <p>Pending</p>
+    </div>
+
+    <div class="stat-card submitted">
+      <span class="icon">✅</span>
+      <h2 id="submittedCount">1</h2>
+      <p>Submitted</p>
+    </div>
+
+    <div class="stat-card missed">
+      <span class="icon">❌</span>
+      <h2 id="missedCount">0</h2>
+      <p>Missed</p>
+    </div>
+
+    <div class="stat-card completion">
+      <span class="icon">📈</span>
+      <h2 id="completion">33%</h2>
+      <p>Completion</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="text" placeholder="Search assignments..." />
+    <select >
+      <option>All Status</option>
+    </select>
+    <button id="addBtn">+ Add</button>
+  </div>
+
+  <div id="assignmentList"></div>
+
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+
+      <span class="close" id="closeModal">&times;</span>
+      <h3>Add Assignment</h3>
+
+      <label>Title *</label>
+      <input type="text" id="title" placeholder="Assignment title" required />
+
+      <label>Subject *</label>
+      <input type="text" id="subject" placeholder="e.g. Mathematics" required />
+
+      <label>Deadline *</label>
+      <input type="datetime-local" id="deadline" required />
+
+      <label>Priority</label>
+      <select id="priority">
+        <option>Low</option>
+        <option selected>Medium</option>
+        <option>High</option>
+      </select>
+
+      <button id="saveAssignment">Add Assignment</button>
+
+    </div>
+  </div>
+
+  <script src="js/index.js"></script>
+
+</body>
+
+</html>

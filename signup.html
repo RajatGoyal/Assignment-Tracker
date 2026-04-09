@@ -1,0 +1,137 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Signup - Assignment Tracker</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#0f172a;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+background:#1e293b;
+padding:40px;
+border-radius:10px;
+width:350px;
+color:white;
+}
+
+h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+border:none;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#10b981;
+border:none;
+border-radius:5px;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#059669;
+}
+
+.password-rules{
+font-size:12px;
+color:#cbd5f5;
+}
+
+a{
+color:#60a5fa;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Sign Up</h2>
+
+<form id="signupForm">
+
+<input type="text" id="name" placeholder="Full Name" required>
+
+<input type="email" id="email" placeholder="Email" required>
+
+<input type="password"
+id="password"
+placeholder="Password"
+pattern="^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.*[0-9]).{8,}$"
+title="Password must contain 1 uppercase, 1 number, 1 special character and be at least 8 characters"
+required>
+
+<p class="password-rules">
+Password must include:<br>
+• 1 uppercase letter<br>
+• 1 number<br>
+• 1 special character<br>
+• Minimum 8 characters
+</p>
+
+<button type="submit">Create Account</button>
+
+<p style="text-align:center;margin-top:15px;">
+Already have an account? <a href="login.html">Login</a>
+</p>
+
+</form>
+
+</div>
+
+<script>
+document.getElementById("signupForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch("http://localhost:5000/api/auth/signup",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      name: name,
+      email: email,
+      password: password
+    })
+  });
+
+  const data = await res.json();
+
+  if(res.ok){
+    alert("Account created successfully!");
+    window.location.href="login.html";
+  }else{
+    alert(data.error || "Signup failed");
+  }
+});
+
+</script>
+
+</body>
+</html>
+```

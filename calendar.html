@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ADT | Calendar</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">📘 ADT</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a class="active" href="calendar.html">Calendar</a>
+    <a href="analytics.html">Analytics</a>
+  </div>
+</nav>
+
+<div class="calendar-page">
+
+  <div class="calendar-container">
+
+    <div class="calendar-top">
+      <button id="prevMonth">◀</button>
+      <h2 id="monthYear"></h2>
+      <button id="nextMonth">▶</button>
+    </div>
+
+    <div class="calendar-weekdays">
+      <div>Sun</div>
+      <div>Mon</div>
+      <div>Tue</div>
+      <div>Wed</div>
+      <div>Thu</div>
+      <div>Fri</div>
+      <div>Sat</div>
+    </div>
+
+    <div id="calendarGrid" class="calendar-grid"></div>
+
+  </div>
+
+</div>
+
+<script src="js/calendar.js"></script>
+</body>
+</html>

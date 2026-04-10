@@ -6,42 +6,100 @@ const User = require("../models/User");
 
 const SECRET = "secretkey";
 
-// SIGNUP
+/* ----------- SIGNUP ----------- */
+
 router.post("/signup", async (req, res) => {
   try {
+
     const { email, password } = req.body;
 
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ error: "User already exists" });
+    if(!email || !password){
+      return res.status(400).json({
+        message: "Email and password are required"
+      });
+    }
 
-    const hashed = await bcrypt.hash(password, 10);
+    const existingUser = await User.findOne({ email });
 
-    const user = new User({ email, password: hashed });
-    await user.save();
+    if(existingUser){
+      return res.status(400).json({
+        message: "User already exists"
+      });
+    }
 
-    res.json({ message: "User created" });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      email: email,
+      password: hashedPassword
+    });
+
+    await newUser.save();
+
+    res.status(201).json({
+      message: "Signup successful"
+    });
+
+  } 
+  catch(err){
+    console.error(err);
+
+    res.status(500).json({
+      message: "Server error"
+    });
   }
 });
 
-// LOGIN
+
+/* ----------- LOGIN ----------- */
+
 router.post("/login", async (req, res) => {
   try {
+
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email});
-    if (!user) return res.status(400).json({ error: "User not found" });
+    if(!email || !password){
+      return res.status(400).json({
+        message: "Email and password required"
+      });
+    }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ error: "Wrong password" });
+    const user = await User.findOne({ email });
 
-    const token = jwt.sign({ id: user._id }, SECRET);
+    if(!user){
+      return res.status(400).json({
+        message: "User not found"
+      });
+    }
 
-    res.json({ token });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if(!isMatch){
+      return res.status(400).json({
+        message: "Incorrect password"
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id },
+      SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token: token
+    });
+
+  } 
+  catch(err){
+    console.error(err);
+
+    res.status(500).json({
+      message: "Server error"
+    });
   }
 });
+
 
 module.exports = router;

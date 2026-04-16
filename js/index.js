@@ -1,12 +1,5 @@
 let assignments = [];
 let editIndex = null;
-let statusFilter = "All";
-
-function setStatusFilter(value) {
-  statusFilter = value;
-  document.getElementById("statusFilterBtn").textContent = value === "All" ? "All Status" : value;
-  renderAssignments();
-}
 
 const list = document.getElementById("assignmentList");
 const modal = document.getElementById("modal");
@@ -39,8 +32,6 @@ function renderAssignments() {
   list.innerHTML = "";
 
   assignments.forEach((a, index) => {
-    if (statusFilter !== "All" && a.status !== statusFilter) return;
-
     const card = document.createElement("div");
     card.className = "assignment-card";
 

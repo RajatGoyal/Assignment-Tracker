@@ -1,13 +1,4 @@
-
-function getAssignments() {
-  return JSON.parse(localStorage.getItem("assignments")) || [];
-}
-
-function saveAssignments(data) {
-  localStorage.setItem("assignments", JSON.stringify(data));
-}
-
-let assignments = getAssignments();
+let assignments = [];
 let editIndex = null;
 
 const list = document.getElementById("assignmentList");
@@ -22,28 +13,46 @@ const addBtn = document.getElementById("addBtn");
 const saveBtn = document.getElementById("saveAssignment");
 const closeModal = document.getElementById("closeModal");
 
-renderAssignments();
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+loadAndRender();
+
+async function loadAndRender() {
+  try {
+    assignments = await Api.list();
+    renderAssignments();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Failed to load: " + err.message);
+  }
+}
 
 function renderAssignments() {
   list.innerHTML = "";
-  assignments = getAssignments();
 
   assignments.forEach((a, index) => {
     const card = document.createElement("div");
     card.className = "assignment-card";
 
-   card.innerHTML = `
+    const title = esc(a.title);
+    const subject = esc(a.subject);
+    const priority = esc(a.priority);
+    const priorityClass = esc(a.priority.toLowerCase());
+    const deadline = esc(new Date(a.deadline).toLocaleString());
+
+    card.innerHTML = `
   <div class="card-main">
 
     <!-- LEFT CONTENT -->
     <div class="card-left">
       <div class="card-header">
-        <h3>${a.title}</h3>
-        <span class="priority ${a.priority.toLowerCase()}">${a.priority}</span>
+        <h3>${title}</h3>
+        <span class="priority ${priorityClass}">${priority}</span>
       </div>
 
-      <p><strong>Subject:</strong> ${a.subject}</p>
-      <p><strong>Deadline:</strong> ${new Date(a.deadline).toLocaleString()}</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Deadline:</strong> ${deadline}</p>
 
       <div class="card-actions">
         <button class="edit-btn" onclick="editAssignment(${index})">✏️ Edit</button>
@@ -69,10 +78,15 @@ function renderAssignments() {
 
   updateStats();
 }
-function changeStatus(index, newStatus) {
-  assignments[index].status = newStatus;
-  saveAssignments(assignments);
-  renderAssignments();
+
+async function changeStatus(index, newStatus) {
+  const a = assignments[index];
+  try {
+    await Api.update(a._id, { status: newStatus });
+    await loadAndRender();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Update failed: " + err.message);
+  }
 }
 
 function updateStats() {
@@ -95,7 +109,7 @@ addBtn.onclick = () => {
   modal.style.display = "flex";
 };
 
-saveBtn.onclick = () => {
+saveBtn.onclick = async () => {
   const title = titleInput.value.trim();
   const subject = subjectInput.value.trim();
   const deadline = deadlineInput.value;
@@ -106,29 +120,20 @@ saveBtn.onclick = () => {
     return;
   }
 
-  if (editIndex !== null) {
-    assignments[editIndex] = {
-      ...assignments[editIndex],
-      title,
-      subject,
-      deadline,
-      priority
-    };
-  } else {
-    assignments.push({
-      title,
-      subject,
-      deadline,
-      priority,
-      status: "Pending",
-      createdAt: new Date().toISOString()
-    });
-  }
+  try {
+    if (editIndex !== null) {
+      const a = assignments[editIndex];
+      await Api.update(a._id, { title, subject, deadline, priority });
+    } else {
+      await Api.create({ title, subject, deadline, priority, status: "Pending" });
+    }
 
-  saveAssignments(assignments);
-  modal.style.display = "none";
-  clearForm();
-  renderAssignments();
+    modal.style.display = "none";
+    clearForm();
+    await loadAndRender();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Save failed: " + err.message);
+  }
 };
 
 function editAssignment(index) {
@@ -136,19 +141,23 @@ function editAssignment(index) {
 
   titleInput.value = a.title;
   subjectInput.value = a.subject;
-  deadlineInput.value = a.deadline;
+  deadlineInput.value = typeof a.deadline === "string" ? a.deadline.slice(0, 16) : a.deadline;
   priorityInput.value = a.priority;
 
   editIndex = index;
   modal.style.display = "flex";
 }
 
-function deleteAssignment(index) {
+async function deleteAssignment(index) {
   if (!confirm("Delete this assignment?")) return;
 
-  assignments.splice(index, 1);
-  saveAssignments(assignments);
-  renderAssignments();
+  const a = assignments[index];
+  try {
+    await Api.remove(a._id);
+    await loadAndRender();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Delete failed: " + err.message);
+  }
 }
 
 closeModal.onclick = () => {

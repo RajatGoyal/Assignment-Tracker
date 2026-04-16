@@ -1,6 +1,11 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
-  const assignments = JSON.parse(localStorage.getItem("assignments")) || [];
+  let assignments = [];
+  try {
+    assignments = await Api.list();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Failed to load: " + err.message);
+  }
 
   drawPieChart(assignments);
   drawBarChart(assignments);

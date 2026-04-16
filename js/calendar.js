@@ -3,16 +3,23 @@ const monthYear = document.getElementById("monthYear");
 const prevBtn = document.getElementById("prevMonth");
 const nextBtn = document.getElementById("nextMonth");
 
-let assignments = JSON.parse(localStorage.getItem("assignments")) || [];
+let assignments = [];
 
 const today = new Date();
-let currentMonth = today.getMonth(); // 0-11
+let currentMonth = today.getMonth();
 let currentYear = today.getFullYear();
 
-renderCalendar(currentMonth, currentYear);
+(async () => {
+  try {
+    assignments = await Api.list();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Failed to load: " + err.message);
+  }
+  renderCalendar(currentMonth, currentYear);
+})();
 
 function renderCalendar(month, year) {
-  calendarGrid.innerHTML = "";
+  calendarGrid.replaceChildren();
 
   monthYear.textContent = new Date(year, month).toLocaleString("en-US", {
     month: "long",

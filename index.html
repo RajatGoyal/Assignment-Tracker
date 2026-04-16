@@ -61,9 +61,17 @@ if(!localStorage.getItem("token")){
 
   <div class="controls">
     <input type="text" placeholder="Search assignments..." />
-    <select >
-      <option>All Status</option>
-    </select>
+    <div class="dropdown">
+      <button class="btn btn-outline-light dropdown-toggle" type="button" id="statusFilterBtn" data-bs-toggle="dropdown" aria-expanded="false" style="width: 160px;">
+        All Status
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="statusFilterBtn">
+        <li><a class="dropdown-item" href="#" onclick="setStatusFilter('All'); return false;">All Status</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setStatusFilter('Pending'); return false;">Pending</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setStatusFilter('Submitted'); return false;">Submitted</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setStatusFilter('Missed'); return false;">Missed</a></li>
+      </ul>
+    </div>
     <button id="addBtn">+ Add</button>
   </div>
 

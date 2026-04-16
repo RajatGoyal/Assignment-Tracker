@@ -13,6 +13,7 @@
     <a href="index.html">Dashboard</a>
     <a href="calendar.html">Calendar</a>
     <a class="active" href="analytics.html">Analytics</a>
+    <a href="#" id="logoutBtn">Logout</a>
   </div>
 </nav>
 
@@ -31,5 +32,13 @@
 </div>
 
 <script src="js/analytics.js"></script>
+<script>
+  document.getElementById("logoutBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  });
+</script>
 </body>
 </html>

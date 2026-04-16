@@ -19,6 +19,7 @@ if(!document.cookie.includes("user=loggedin")){
       <a class="active" href="index.html">Dashboard</a>
       <a href="calendar.html">Calendar</a>
       <a href="analytics.html">Analytics</a>
+      <a href="#" id="logoutBtn">Logout</a>
     </div>
   </nav>
   <div class="dash">
@@ -97,6 +98,14 @@ if(!document.cookie.includes("user=loggedin")){
   </div>
 
   <script src="js/index.js"></script>
+  <script>
+    document.getElementById("logoutBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+  </script>
 
 </body>
 

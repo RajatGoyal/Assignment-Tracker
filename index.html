@@ -9,7 +9,7 @@
 
 <body>
 <script>
-if(!document.cookie.includes("user=loggedin")){
+if(!localStorage.getItem("token")){
     window.location.href = "login.html";
 }
 </script>

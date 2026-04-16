@@ -101,7 +101,7 @@ body:JSON.stringify({email,password})
 const data=await res.json();
 
 if(res.ok){
-  document.cookie = "user=loggedin; path=/;";
+  localStorage.setItem("token", data.token);
   alert("Login successful");
   window.location.href="index.html";
 }else{

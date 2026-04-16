@@ -221,34 +221,6 @@ body {
 .edit-btn { background: #2563eb; color: white; }
 .delete-btn { background: #dc2626; color: white; }
 
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: #171a23;
-  padding: 25px;
-  border-radius: 10px;
-  width: 300px;
-}
-
-.modal-content input,
-.modal-content select {
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-}
-
-.close {
-  float: right;
-  cursor: pointer;
-}
-
 .calendar-page {
   width: 100%;
   display: flex;

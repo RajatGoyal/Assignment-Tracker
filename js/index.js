@@ -9,7 +9,9 @@ function setStatusFilter(value) {
 }
 
 const list = document.getElementById("assignmentList");
-const modal = document.getElementById("modal");
+const modalEl = document.getElementById("modal");
+const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+const modalLabel = document.getElementById("modalLabel");
 
 const titleInput = document.getElementById("title");
 const subjectInput = document.getElementById("subject");
@@ -18,7 +20,6 @@ const priorityInput = document.getElementById("priority");
 
 const addBtn = document.getElementById("addBtn");
 const saveBtn = document.getElementById("saveAssignment");
-const closeModal = document.getElementById("closeModal");
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -119,7 +120,9 @@ function updateStats() {
 addBtn.onclick = () => {
   editIndex = null;
   clearForm();
-  modal.style.display = "flex";
+  modalLabel.textContent = "Add Assignment";
+  saveBtn.textContent = "Add Assignment";
+  modal.show();
 };
 
 saveBtn.onclick = async () => {
@@ -141,7 +144,7 @@ saveBtn.onclick = async () => {
       await Api.create({ title, subject, deadline, priority, status: "Pending" });
     }
 
-    modal.style.display = "none";
+    modal.hide();
     clearForm();
     await loadAndRender();
   } catch (err) {
@@ -158,7 +161,9 @@ function editAssignment(index) {
   priorityInput.value = a.priority;
 
   editIndex = index;
-  modal.style.display = "flex";
+  modalLabel.textContent = "Edit Assignment";
+  saveBtn.textContent = "Save Changes";
+  modal.show();
 }
 
 async function deleteAssignment(index) {
@@ -172,10 +177,6 @@ async function deleteAssignment(index) {
     if (err.message !== "Unauthorized") alert("Delete failed: " + err.message);
   }
 }
-
-closeModal.onclick = () => {
-  modal.style.display = "none";
-};
 
 function clearForm() {
   titleInput.value = "";

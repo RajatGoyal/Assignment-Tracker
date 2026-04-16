@@ -210,17 +210,6 @@ body {
   gap: 10px;
 }
 
-.card-actions button {
-  padding: 5px 10px;
-  font-size: 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-.edit-btn { background: #2563eb; color: white; }
-.delete-btn { background: #dc2626; color: white; }
-
 .calendar-page {
   width: 100%;
   display: flex;

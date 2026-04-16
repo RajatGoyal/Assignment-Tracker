@@ -65,8 +65,8 @@ function renderAssignments() {
       <p><strong>Deadline:</strong> ${deadline}</p>
 
       <div class="card-actions">
-        <button class="edit-btn" onclick="editAssignment(${index})">✏️ Edit</button>
-        <button class="delete-btn" onclick="deleteAssignment(${index})">🗑 Delete</button>
+        <button class="btn btn-sm btn-primary" onclick="editAssignment(${index})">✏️ Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteAssignment(${index})">🗑 Delete</button>
       </div>
     </div>
 

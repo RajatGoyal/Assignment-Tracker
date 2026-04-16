@@ -47,15 +47,13 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
   const res = await fetch("http://localhost:5050/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
+    credentials: "include"
   });
 
   const data = await res.json();
 
   if (res.ok) {
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("role", data.role);
-    if (data.name) localStorage.setItem("name", data.name);
     window.location.href = data.role === "teacher" ? "classes.html" : "index.html";
   } else {
     alert(data.message || "Login failed");

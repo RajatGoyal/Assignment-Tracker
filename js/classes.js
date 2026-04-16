@@ -1,4 +1,4 @@
-const role = Auth.role();
+let role = null;
 
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
@@ -130,26 +130,27 @@ async function loadClasses() {
   }
 }
 
-if (role === "teacher") {
-  document.getElementById("createClassBtn").addEventListener("click", async () => {
-    const name = document.getElementById("className").value.trim();
-    const subject = document.getElementById("classSubject").value.trim();
-    if (!name || !subject) {
-      alert("Class name and subject are required.");
-      return;
-    }
-    try {
-      await Api.createClass({ name, subject });
-      bootstrap.Modal.getOrCreateInstance(document.getElementById("createClassModal")).hide();
-      document.getElementById("className").value = "";
-      document.getElementById("classSubject").value = "";
-      await loadClasses();
-    } catch (err) {
-      if (err.message !== "Unauthorized") alert(err.message);
-    }
-  });
-}
+document.getElementById("createClassBtn").addEventListener("click", async () => {
+  const name = document.getElementById("className").value.trim();
+  const subject = document.getElementById("classSubject").value.trim();
+  if (!name || !subject) {
+    alert("Class name and subject are required.");
+    return;
+  }
+  try {
+    await Api.createClass({ name, subject });
+    bootstrap.Modal.getOrCreateInstance(document.getElementById("createClassModal")).hide();
+    document.getElementById("className").value = "";
+    document.getElementById("classSubject").value = "";
+    await loadClasses();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert(err.message);
+  }
+});
 
-renderNav();
-renderActionPanel();
-loadClasses();
+Auth.ready().then(() => {
+  role = Auth.role();
+  renderNav();
+  renderActionPanel();
+  loadClasses();
+});

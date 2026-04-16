@@ -91,9 +91,16 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/"
+    });
+
     res.status(200).json({
       message: "Login successful",
-      token: token,
       role: user.role,
       name: user.name
     });
@@ -106,6 +113,14 @@ router.post("/login", async (req, res) => {
       message: "Server error"
     });
   }
+});
+
+
+/* ----------- LOGOUT ----------- */
+
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", { path: "/" });
+  res.status(200).json({ message: "Logged out" });
 });
 
 

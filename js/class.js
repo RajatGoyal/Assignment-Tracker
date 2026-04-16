@@ -1,4 +1,4 @@
-const role = Auth.role();
+let role = null;
 const params = new URLSearchParams(window.location.search);
 const classId = params.get("id");
 
@@ -243,5 +243,8 @@ document.getElementById("saveAssignmentBtn").addEventListener("click", async () 
   }
 });
 
-renderNav();
-loadClass();
+Auth.ready().then(() => {
+  role = Auth.role();
+  renderNav();
+  loadClass();
+});

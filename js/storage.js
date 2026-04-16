@@ -1,16 +1,14 @@
 const API_BASE = "http://localhost:5050";
 
-async function apiFetch(path, options = {}) {
-  const token = localStorage.getItem("token");
-  const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
-  if (token) headers["Authorization"] = "Bearer " + token;
+let currentUser = null;
+let readyPromise = null;
 
-  const res = await fetch(API_BASE + path, { ...options, headers });
+async function apiFetch(path, options = {}) {
+  const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+  const res = await fetch(API_BASE + path, { ...options, headers, credentials: "include" });
 
   if (res.status === 401) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("name");
+    currentUser = null;
     window.location.href = "login.html";
     throw new Error("Unauthorized");
   }
@@ -24,29 +22,56 @@ async function apiFetch(path, options = {}) {
 }
 
 window.Auth = {
-  token: () => localStorage.getItem("token"),
-  role: () => localStorage.getItem("role"),
-  name: () => localStorage.getItem("name"),
-  isLoggedIn: () => !!localStorage.getItem("token") && !!localStorage.getItem("role"),
-  logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("name");
-    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  role: () => currentUser?.role || null,
+  name: () => currentUser?.name || null,
+  isLoggedIn: () => !!currentUser,
+
+  // Promise that resolves once requireRole has finished its /api/me check.
+  // Page scripts should: Auth.ready().then(async () => { ... })
+  ready: () => readyPromise,
+
+  logout: async () => {
+    try {
+      await fetch(API_BASE + "/api/auth/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (_) {}
+    currentUser = null;
     window.location.href = "login.html";
   },
-  // Page-level guard: redirect to login if not logged in;
-  // if a required role is given, redirect mismatched roles to their home.
+
+  // Page-level guard. Hides <html> until /api/me resolves so we don't
+  // flash protected content before a redirect.
   requireRole(requiredRole) {
-    if (!this.isLoggedIn()) {
-      window.location.href = "login.html";
-      return false;
-    }
-    if (requiredRole && this.role() !== requiredRole) {
-      window.location.href = this.role() === "teacher" ? "classes.html" : "index.html";
-      return false;
-    }
-    return true;
+    document.documentElement.style.visibility = "hidden";
+
+    readyPromise = (async () => {
+      let res;
+      try {
+        res = await fetch(API_BASE + "/api/me", { credentials: "include" });
+      } catch (_) {
+        window.location.href = "login.html";
+        return new Promise(() => {});
+      }
+
+      if (!res.ok) {
+        window.location.href = "login.html";
+        return new Promise(() => {});
+      }
+
+      currentUser = await res.json();
+
+      if (requiredRole && currentUser.role !== requiredRole) {
+        window.location.href = currentUser.role === "teacher" ? "classes.html" : "index.html";
+        return new Promise(() => {});
+      }
+
+      document.documentElement.style.visibility = "";
+      return currentUser;
+    })();
+
+    return readyPromise;
   }
 };
 

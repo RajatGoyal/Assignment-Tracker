@@ -4,6 +4,7 @@ const Class = require("../models/Class");
 const Enrollment = require("../models/Enrollment");
 const Assignment = require("../models/Assignment");
 const Submission = require("../models/Submission");
+const User = require("../models/User");
 const requireAuth = require("../middleware/auth");
 
 router.use(requireAuth);
@@ -15,6 +16,21 @@ function deriveStatus(rawStatus, deadline) {
   if (deadline && new Date(deadline).getTime() < Date.now()) return "Missed";
   return "Pending";
 }
+
+
+// ================= CURRENT USER =================
+// Used by the frontend to hydrate role/name after login (the token cookie is
+// httpOnly, so JS can't read the JWT payload itself).
+router.get("/", async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id, "name email role").lean();
+    if (!user) return res.status(404).json({ message: "Not found" });
+    res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 // ================= LIST MY CLASSES =================

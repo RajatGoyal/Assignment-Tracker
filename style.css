@@ -199,6 +199,11 @@ body {
   font-size: medium;
 }
 
+.status-dropdown {
+  width: 122px;
+  border-radius: 15px;
+}
+
 .card-actions {
   margin-top: 8px;
   display: flex;

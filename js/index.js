@@ -62,12 +62,16 @@ function renderAssignments() {
 
     <!-- RIGHT STATUS -->
     <div class="card-right">
-      <select class="status-select"
-        onchange="changeStatus(${index}, this.value)">
-        <option value="Pending" ${a.status === "Pending" ? "selected" : ""}>Pending</option>
-        <option value="Submitted" ${a.status === "Submitted" ? "selected" : ""}>Submitted</option>
-        <option value="Missed" ${a.status === "Missed" ? "selected" : ""}>Missed</option>
-      </select>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-light dropdown-toggle status-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          ${esc(a.status)}
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" onclick="changeStatus(${index}, 'Pending'); return false;">Pending</a></li>
+          <li><a class="dropdown-item" href="#" onclick="changeStatus(${index}, 'Submitted'); return false;">Submitted</a></li>
+          <li><a class="dropdown-item" href="#" onclick="changeStatus(${index}, 'Missed'); return false;">Missed</a></li>
+        </ul>
+      </div>
     </div>
 
   </div>

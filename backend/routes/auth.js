@@ -11,11 +11,11 @@ const SECRET = "secretkey";
 router.post("/signup", async (req, res) => {
   try {
 
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if(!email || !password){
+    if(!name || !email || !password){
       return res.status(400).json({
-        message: "Email and password are required"
+        message: "Name, email and password are required"
       });
     }
 
@@ -30,6 +30,7 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
+      name: name,
       email: email,
       password: hashedPassword
     });

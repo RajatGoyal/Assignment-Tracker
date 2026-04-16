@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <title>ADT | Analytics</title>
@@ -26,13 +26,13 @@ if(!localStorage.getItem("token")){
 
 <div class="container analytics-container">
 
-  <div class="chart-card">
-    <h3>Status Distribution</h3>
+  <div class="chart-card card shadow">
+    <h3 class="card-title">Status Distribution</h3>
     <canvas id="pieChart" width="300" height="300"></canvas>
   </div>
 
-  <div class="chart-card">
-    <h3>Assignments by Priority</h3>
+  <div class="chart-card card shadow">
+    <h3 class="card-title">Assignments by Priority</h3>
     <canvas id="barChart" width="400" height="300"></canvas>
   </div>
 

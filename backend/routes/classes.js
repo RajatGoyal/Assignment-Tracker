@@ -94,9 +94,26 @@ router.get("/:id", async (req, res) => {
       }));
     }
 
+    let assignmentsForView = assignments;
+    if (isStudent) {
+      const subs = await Submission.find({
+        assignmentId: { $in: assignments.map(a => a._id) },
+        studentId: req.user.id
+      }).lean();
+      const subBy = new Map(subs.map(s => [String(s.assignmentId), s]));
+      assignmentsForView = assignments.map(a => {
+        const sub = subBy.get(String(a._id));
+        return {
+          ...a,
+          submissionStatus: sub ? sub.status : "Pending",
+          hasSubmission: !!sub
+        };
+      });
+    }
+
     res.json({
       ...cls,
-      assignments,
+      assignments: assignmentsForView,
       roster,
       viewerRole: isTeacher ? "teacher" : "student"
     });

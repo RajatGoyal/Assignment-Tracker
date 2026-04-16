@@ -75,7 +75,7 @@ function renderTeacherAssignmentRow(a) {
 }
 
 function renderStudentAssignmentRow(a) {
-  const status = deriveStatus("Pending", a.deadline);
+  const status = deriveStatus(a.submissionStatus || "Pending", a.deadline);
   const card = el("div", { class: "assignment-card mb-2" });
   const left = el("div", { class: "card-left" },
     el("div", { class: "card-header" },
@@ -90,7 +90,7 @@ function renderStudentAssignmentRow(a) {
       el("button", {
         class: "btn btn-sm btn-primary",
         onClick: () => openSubmitModal(a._id)
-      }, "📝 Open Submission")
+      }, status === "Submitted" ? "📝 Update Submission" : "📝 Open Submission")
     )
   );
   const right = el("div", { class: "card-right" },
@@ -102,7 +102,8 @@ function renderStudentAssignmentRow(a) {
 
 function renderRoster(roster) {
   const container = document.getElementById("rosterList");
-  document.getElementById("rosterHeader").style.display = "block";
+  document.getElementById("rosterCol").style.display = "block";
+  document.getElementById("assignmentsCol").className = "col-lg-7";
   container.replaceChildren();
 
   if (roster.length === 0) {

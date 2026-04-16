@@ -27,7 +27,7 @@ window.Auth = {
   token: () => localStorage.getItem("token"),
   role: () => localStorage.getItem("role"),
   name: () => localStorage.getItem("name"),
-  isLoggedIn: () => !!localStorage.getItem("token"),
+  isLoggedIn: () => !!localStorage.getItem("token") && !!localStorage.getItem("role"),
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");

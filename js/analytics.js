@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let assignments = [];
   try {
-    assignments = await Api.list();
+    assignments = await Api.myAssignments();
   } catch (err) {
     if (err.message !== "Unauthorized") alert("Failed to load: " + err.message);
   }

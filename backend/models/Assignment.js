@@ -1,17 +1,18 @@
 const mongoose = require("mongoose");
 
 const AssignmentSchema = new mongoose.Schema({
-  user: {
+  classId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Class",
     required: true,
     index: true
   },
-  title: {
-    type: String,
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: true
   },
-  subject: {
+  title: {
     type: String,
     required: true
   },
@@ -27,11 +28,6 @@ const AssignmentSchema = new mongoose.Schema({
     type: String,
     enum: ["Low", "Medium", "High"],
     default: "Medium"
-  },
-  status: {
-    type: String,
-    enum: ["Pending", "Submitted", "Missed"],
-    default: "Pending"
   },
   createdAt: {
     type: Date,

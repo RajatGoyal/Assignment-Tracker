@@ -1,6 +1,38 @@
 let assignments = [];
-let editIndex = null;
 let statusFilter = "All";
+let searchTerm = "";
+let currentAssignment = null;
+
+const list = document.getElementById("assignmentList");
+const submitModalEl = document.getElementById("submitModal");
+const submitModal = bootstrap.Modal.getOrCreateInstance(submitModalEl);
+const submitModalLabel = document.getElementById("submitModalLabel");
+const assignmentMeta = document.getElementById("assignmentMeta");
+const submissionContent = document.getElementById("submissionContent");
+const submissionLink = document.getElementById("submissionLink");
+const saveDraftBtn = document.getElementById("saveDraftBtn");
+const submitBtn = document.getElementById("submitBtn");
+const searchInput = document.getElementById("searchInput");
+
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") node.className = v;
+    else if (k === "dataset") Object.assign(node.dataset, v);
+    else if (k === "onClick") node.addEventListener("click", v);
+    else if (k in node) node[k] = v;
+    else node.setAttribute(k, v);
+  }
+  for (const child of children) {
+    if (child == null) continue;
+    if (typeof child === "string" || typeof child === "number") {
+      node.appendChild(document.createTextNode(String(child)));
+    } else {
+      node.appendChild(child);
+    }
+  }
+  return node;
+}
 
 function setStatusFilter(value) {
   statusFilter = value;
@@ -8,99 +40,90 @@ function setStatusFilter(value) {
   renderAssignments();
 }
 
-const list = document.getElementById("assignmentList");
-const modalEl = document.getElementById("modal");
-const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-const modalLabel = document.getElementById("modalLabel");
-
-const titleInput = document.getElementById("title");
-const subjectInput = document.getElementById("subject");
-const deadlineInput = document.getElementById("deadline");
-const priorityInput = document.getElementById("priority");
-
-const addBtn = document.getElementById("addBtn");
-const saveBtn = document.getElementById("saveAssignment");
-
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
+searchInput.addEventListener("input", (e) => {
+  searchTerm = e.target.value.toLowerCase();
+  renderAssignments();
+});
 
 loadAndRender();
 
 async function loadAndRender() {
   try {
-    assignments = await Api.list();
+    assignments = await Api.myAssignments();
     renderAssignments();
   } catch (err) {
     if (err.message !== "Unauthorized") alert("Failed to load: " + err.message);
   }
 }
 
-function renderAssignments() {
-  list.innerHTML = "";
-
-  assignments.forEach((a, index) => {
-    if (statusFilter !== "All" && a.status !== statusFilter) return;
-
-    const card = document.createElement("div");
-    card.className = "assignment-card";
-
-    const title = esc(a.title);
-    const subject = esc(a.subject);
-    const priority = esc(a.priority);
-    const priorityClass = esc(a.priority.toLowerCase());
-    const deadline = esc(new Date(a.deadline).toLocaleString());
-
-    card.innerHTML = `
-  <div class="card-main">
-
-    <!-- LEFT CONTENT -->
-    <div class="card-left">
-      <div class="card-header">
-        <h3>${title}</h3>
-        <span class="priority ${priorityClass}">${priority}</span>
-      </div>
-
-      <p><strong>Subject:</strong> ${subject}</p>
-      <p><strong>Deadline:</strong> ${deadline}</p>
-
-      <div class="card-actions">
-        <button class="btn btn-sm btn-primary" onclick="editAssignment(${index})">✏️ Edit</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteAssignment(${index})">🗑 Delete</button>
-      </div>
-    </div>
-
-    <!-- RIGHT STATUS -->
-    <div class="card-right">
-      <div class="dropdown">
-        <button class="btn btn-sm btn-outline-light dropdown-toggle status-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          ${esc(a.status)}
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#" onclick="changeStatus(${index}, 'Pending'); return false;">Pending</a></li>
-          <li><a class="dropdown-item" href="#" onclick="changeStatus(${index}, 'Submitted'); return false;">Submitted</a></li>
-          <li><a class="dropdown-item" href="#" onclick="changeStatus(${index}, 'Missed'); return false;">Missed</a></li>
-        </ul>
-      </div>
-    </div>
-
-  </div>
-`;
-
-    list.appendChild(card);
-  });
-
-  updateStats();
+function renderEmptyState() {
+  list.replaceChildren(
+    el("div", { class: "empty-state" },
+      el("h3", {}, "No assignments yet"),
+      el("p", {}, "Join a class to start receiving assignments."),
+      el("a", { href: "classes.html", class: "btn btn-primary" }, "Go to Classes")
+    )
+  );
 }
 
-async function changeStatus(index, newStatus) {
-  const a = assignments[index];
-  try {
-    await Api.update(a._id, { status: newStatus });
-    await loadAndRender();
-  } catch (err) {
-    if (err.message !== "Unauthorized") alert("Update failed: " + err.message);
+function renderAssignmentCard(a) {
+  const card = el("div", { class: "assignment-card" });
+
+  const left = el("div", { class: "card-left" },
+    el("div", { class: "card-header" },
+      el("h3", {}, a.title),
+      el("span", { class: "priority " + a.priority.toLowerCase() }, a.priority)
+    ),
+    el("p", {},
+      el("strong", {}, "Class: "),
+      a.className || "",
+      " ",
+      el("span", { class: "text-muted" }, "(" + (a.subject || "") + ")")
+    ),
+    el("p", {},
+      el("strong", {}, "Deadline: "),
+      new Date(a.deadline).toLocaleString()
+    ),
+    el("div", { class: "card-actions" },
+      el("button", {
+        class: "btn btn-sm btn-primary",
+        onClick: () => openSubmitModal(a._id)
+      }, a.status === "Submitted" ? "📝 Update" : "📝 Submit")
+    )
+  );
+
+  const right = el("div", { class: "card-right" },
+    el("span", { class: "status-badge status-" + a.status.toLowerCase() }, a.status)
+  );
+
+  card.appendChild(el("div", { class: "card-main" }, left, right));
+  return card;
+}
+
+function renderAssignments() {
+  if (assignments.length === 0) {
+    renderEmptyState();
+    updateStats();
+    return;
   }
+
+  const filtered = assignments.filter(a => {
+    if (statusFilter !== "All" && a.status !== statusFilter) return false;
+    if (searchTerm) {
+      const hay = (a.title + " " + (a.subject || "") + " " + (a.className || "")).toLowerCase();
+      if (!hay.includes(searchTerm)) return false;
+    }
+    return true;
+  });
+
+  list.replaceChildren();
+  filtered.forEach(a => list.appendChild(renderAssignmentCard(a)));
+
+  if (filtered.length === 0) {
+    list.appendChild(el("div", { class: "empty-state" }, el("p", {}, "No assignments match your filter.")));
+  }
+
+  updateStats();
 }
 
 function updateStats() {
@@ -117,70 +140,53 @@ function updateStats() {
     total ? Math.round((submitted / total) * 100) + "%" : "0%";
 }
 
-addBtn.onclick = () => {
-  editIndex = null;
-  clearForm();
-  modalLabel.textContent = "Add Assignment";
-  saveBtn.textContent = "Add Assignment";
-  modal.show();
-};
+async function openSubmitModal(assignmentId) {
+  try {
+    const detail = await Api.getAssignment(assignmentId);
+    currentAssignment = detail;
 
-saveBtn.onclick = async () => {
-  const title = titleInput.value.trim();
-  const subject = subjectInput.value.trim();
-  const deadline = deadlineInput.value;
-  const priority = priorityInput.value;
+    submitModalLabel.textContent = detail.title;
 
-  if (!title || !subject || !deadline) {
-    alert("Please fill all required fields");
+    const meta = el("div", {});
+    const badges = el("div", { class: "mb-2" });
+    if (detail.classId?.name) badges.appendChild(el("span", { class: "badge bg-secondary me-1" }, detail.classId.name));
+    if (detail.classId?.subject) badges.appendChild(el("span", { class: "badge bg-info text-dark me-1" }, detail.classId.subject));
+    badges.appendChild(el("span", { class: "badge bg-warning text-dark" }, detail.priority));
+    meta.appendChild(badges);
+    if (detail.description) meta.appendChild(el("p", {}, detail.description));
+    meta.appendChild(el("p", { class: "text-muted small mb-0" },
+      el("strong", {}, "Due: "),
+      new Date(detail.deadline).toLocaleString()
+    ));
+    assignmentMeta.replaceChildren(meta);
+
+    submissionContent.value = detail.submission?.content || "";
+    submissionLink.value = detail.submission?.linkUrl || "";
+
+    submitModal.show();
+  } catch (err) {
+    if (err.message !== "Unauthorized") alert("Failed to open: " + err.message);
+  }
+}
+
+async function saveSubmission(status) {
+  if (!currentAssignment) return;
+  const content = submissionContent.value.trim();
+  const linkUrl = submissionLink.value.trim();
+
+  if (status === "Submitted" && !content && !linkUrl) {
+    alert("Please add some content or a link before submitting.");
     return;
   }
 
   try {
-    if (editIndex !== null) {
-      const a = assignments[editIndex];
-      await Api.update(a._id, { title, subject, deadline, priority });
-    } else {
-      await Api.create({ title, subject, deadline, priority, status: "Pending" });
-    }
-
-    modal.hide();
-    clearForm();
+    await Api.submitAssignment(currentAssignment._id, { status, content, linkUrl });
+    submitModal.hide();
     await loadAndRender();
   } catch (err) {
     if (err.message !== "Unauthorized") alert("Save failed: " + err.message);
   }
-};
-
-function editAssignment(index) {
-  const a = assignments[index];
-
-  titleInput.value = a.title;
-  subjectInput.value = a.subject;
-  deadlineInput.value = typeof a.deadline === "string" ? a.deadline.slice(0, 16) : a.deadline;
-  priorityInput.value = a.priority;
-
-  editIndex = index;
-  modalLabel.textContent = "Edit Assignment";
-  saveBtn.textContent = "Save Changes";
-  modal.show();
 }
 
-async function deleteAssignment(index) {
-  if (!confirm("Delete this assignment?")) return;
-
-  const a = assignments[index];
-  try {
-    await Api.remove(a._id);
-    await loadAndRender();
-  } catch (err) {
-    if (err.message !== "Unauthorized") alert("Delete failed: " + err.message);
-  }
-}
-
-function clearForm() {
-  titleInput.value = "";
-  subjectInput.value = "";
-  deadlineInput.value = "";
-  priorityInput.value = "Medium";
-}
+saveDraftBtn.addEventListener("click", () => saveSubmission("Pending"));
+submitBtn.addEventListener("click", () => saveSubmission("Submitted"));

@@ -37,6 +37,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/me", require("./routes/me"));
+app.use("/api/classes", require("./routes/classes"));
 app.use("/api/assignments", require("./routes/assignments"));
 
 /* ---------------- ERROR HANDLER ---------------- */

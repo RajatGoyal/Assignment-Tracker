@@ -313,3 +313,49 @@ body {
 .chart-card h3 {
   margin-bottom: 10px;
 }
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  min-width: 100px;
+  text-align: center;
+}
+
+.status-badge.status-pending   { background: #312e1f; color: #facc15; border-color: #5f4320; }
+.status-badge.status-submitted { background: #134e4a; color: #6ee7b7; border-color: #115e59; }
+.status-badge.status-missed    { background: #4c0519; color: #fca5a5; border-color: #7f1d1d; }
+
+.empty-state {
+  margin: 40px 55px;
+  padding: 40px 24px;
+  text-align: center;
+  background: #111827;
+  border: 1px dashed #374151;
+  border-radius: 14px;
+  color: #9ca3af;
+}
+
+.empty-state h3 {
+  color: #e5e7eb;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+}
+
+.submission-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.submission-table td {
+  vertical-align: middle;
+}

@@ -11,7 +11,7 @@ let currentYear = today.getFullYear();
 
 (async () => {
   try {
-    assignments = await Api.list();
+    assignments = await Api.myAssignments();
   } catch (err) {
     if (err.message !== "Unauthorized") alert("Failed to load: " + err.message);
   }

@@ -11,13 +11,15 @@ const SECRET = process.env.JWT_SECRET;
 router.post("/signup", async (req, res) => {
   try {
 
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if(!name || !email || !password){
       return res.status(400).json({
         message: "Name, email and password are required"
       });
     }
+
+    const normalizedRole = role === "teacher" ? "teacher" : "student";
 
     const existingUser = await User.findOne({ email });
 
@@ -32,16 +34,18 @@ router.post("/signup", async (req, res) => {
     const newUser = new User({
       name: name,
       email: email,
-      password: hashedPassword
+      password: hashedPassword,
+      role: normalizedRole
     });
 
     await newUser.save();
 
     res.status(201).json({
-      message: "Signup successful"
+      message: "Signup successful",
+      role: normalizedRole
     });
 
-  } 
+  }
   catch(err){
     console.error(err);
 
@@ -82,17 +86,19 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id },
+      { id: user._id, role: user.role },
       SECRET,
       { expiresIn: "1d" }
     );
 
     res.status(200).json({
       message: "Login successful",
-      token: token
+      token: token,
+      role: user.role,
+      name: user.name
     });
 
-  } 
+  }
   catch(err){
     console.error(err);
 

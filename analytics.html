@@ -8,11 +8,8 @@
 </head>
 <body>
 
-<script>
-if(!localStorage.getItem("token")){
-    window.location.href = "login.html";
-}
-</script>
+<script src="js/storage.js"></script>
+<script>Auth.requireRole("student");</script>
 
 <nav class="navbar">
   <div class="logo">📘 ADT</div>
@@ -20,6 +17,7 @@ if(!localStorage.getItem("token")){
     <a href="index.html">Dashboard</a>
     <a href="calendar.html">Calendar</a>
     <a class="active" href="analytics.html">Analytics</a>
+    <a href="classes.html">Classes</a>
     <a href="#" id="logoutBtn">Logout</a>
   </div>
 </nav>
@@ -39,14 +37,11 @@ if(!localStorage.getItem("token")){
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/storage.js"></script>
 <script src="js/analytics.js"></script>
 <script>
   document.getElementById("logoutBtn").addEventListener("click", (e) => {
     e.preventDefault();
-    document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
+    Auth.logout();
   });
 </script>
 </body>

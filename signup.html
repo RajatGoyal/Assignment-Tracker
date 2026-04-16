@@ -11,10 +11,21 @@
 
 <body class="d-flex justify-content-center align-items-center vh-100">
 
-<div class="card text-light p-4 shadow" style="width: 360px; background: #1e293b;">
+<div class="card text-light p-4 shadow" style="width: 380px; background: #1e293b;">
   <h2 class="text-center mb-4">Sign Up</h2>
 
   <form id="signupForm">
+    <div class="mb-3">
+      <label class="form-label">I am a...</label>
+      <div class="btn-group w-100" role="group" aria-label="Role">
+        <input type="radio" class="btn-check" name="role" id="roleStudent" value="student" autocomplete="off" checked>
+        <label class="btn btn-outline-light" for="roleStudent">🎓 Student</label>
+
+        <input type="radio" class="btn-check" name="role" id="roleTeacher" value="teacher" autocomplete="off">
+        <label class="btn btn-outline-light" for="roleTeacher">👩‍🏫 Teacher</label>
+      </div>
+    </div>
+
     <div class="mb-3">
       <input type="text" id="name" class="form-control" placeholder="Full Name" required>
     </div>
@@ -56,11 +67,12 @@ document.getElementById("signupForm").addEventListener("submit", async function(
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const role = document.querySelector('input[name="role"]:checked').value;
 
   const res = await fetch("http://localhost:5050/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, email, password })
+    body: JSON.stringify({ name, email, password, role })
   });
 
   const data = await res.json();
